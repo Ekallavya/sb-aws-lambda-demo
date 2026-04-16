@@ -1,0 +1,177 @@
+##Create New Spring Boot Lambda Project
+
+	# open Intellij and navigate
+	
+	 -> File -> New -> project 
+	    give input to project name
+		
+		select appropriate JDK version
+		
+		select catalog   Maven Central from drop-down list
+		
+		select appropriate Archetype  from drop-down list
+		
+			Ex: com.amazonaws.serverless.archetypes:aws-serverless-springboot3-archetype
+			
+		select appropriate version from drop-down
+		
+		click on create (it will create new project specified local location)
+		
+	# verify project setting
+	
+		-> check pom.xml following dependecies are created
+	  
+	  
+			<dependency>
+				<groupId>com.amazonaws.serverless</groupId>
+				<artifactId>aws-serverless-java-container-springboot3</artifactId>
+				<version>2.1.2</version>
+			</dependency>
+			<dependency>
+				<groupId>com.amazonaws.serverless</groupId>
+				<artifactId>aws-serverless-java-container-core</artifactId>
+				<version>2.1.2</version>
+				<classifier>tests</classifier>
+				<type>test-jar</type>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents.client5</groupId>
+				<artifactId>httpclient5</artifactId>
+				<version>5.2.1</version>
+				<scope>test</scope>
+			</dependency>
+		
+		
+			<profile>
+				<id>assembly-zip</id>
+			
+		-> check template.yml properly created
+		
+			Resources:
+			  AwsLambdaExampleFunction:
+				Type: AWS::Serverless::Function
+				Properties:
+				  Handler: org.example.StreamLambdaHandler::handleRequest
+				  Runtime: java21
+				  CodeUri: .
+				  MemorySize: 512
+				  Policies: AWSLambdaBasicExecutionRole
+				  Timeout: 30
+				  Events:
+					ProxyResource:
+					  Type: Api
+					  Properties:
+						Path: /{proxy+}
+						Method: any
+						
+						
+				Note: 
+						Path: /{proxy+}  should used  ,while creating AWS lambda function in AWS management console
+	
+	# ensure  StreamLambdaHandler.java (which implements StreamLambdaHandler) is created by default to handle all api request
+						
+						
+	# Implement necessay components -> DTO,Repositories JPA ,Service,Controller,Configuration 
+	
+		mvn clean install for successful build and ensure  specified zip file is created in target folder
+		
+		
+# login AWS management console
+
+	-> search AWS Lambda service
+	-> click on create function
+	-> select Author from scratch
+	-> give input for project name
+			ex:order-service
+	-> select Runtime from drop-down
+	    ex: java21
+	-> select Architecture
+	     x86_64
+		 
+	-> click on create function
+	
+		after successful function creation will be navigated to Diagram and template window
+		
+	-> navigate to code section , click on upload from
+	  
+	      browse and upload your project zip file from local file system ( project/target folder)
+		  
+		  click on save
+		  
+	# handler settings
+		  
+		-> navigate to runtime settings
+		-> click on Edit
+		-> ensure appropriate runtime
+			 ex: java21
+			 
+		-> give input or set appropriate project handler
+
+			ex:
+				 org.example.StreamLambdaHandler::handleRequest		
+
+		-> click on save
+	
+	# Test
+	
+		-> navigate to  test and click on it
+		->  create new event
+		-> give input for event name
+		-> select template from drop-down
+		
+		   ex:apigateway-aws-proxy
+		   
+		-> go to event.json 
+		-> modify appropriate path and method based on your project api(controller)
+		-> click on Test and verify response
+
+# AWS API-Gateway setup
+
+	-> login AWS console
+	-> search for AWS API-Gateway service
+	-> navigate to REST API
+	-> click on Build
+	-> slect New API
+	-> give input to API name
+		ex: course-api
+	-> click on create API
+	-> after successful creation ,will be displayed Resoures page
+	-> click on create Resources
+	-> give input to Resource name
+	
+	    ex: {proxy+}
+	-> click on Create resource
+				
+	-> after successful resource creation ,will be redirected Resources page
+	-> navigate to create method  and click on it
+	-> choose method type option is ANY  (from drop-down)
+	-> select Integration type :Lambda proxy (radio button)
+	-> navigate to lambda function
+	
+			ensure  appropriate region and  appropriate function ARN (Amazon Resource Name)
+			
+	-> click on create method
+	->after successful create method
+	-> click on Deploy API
+	-> select stage from drop-down : New stage
+	-> give input stage name 
+	    ex:dev , uat ,prod
+		
+	-> click on Deploy
+	-> after successful deploy ,all Http methods will be displayed under proxy+
+	
+	-> navigate to  Invoke URL and copy that URL  and use the same url for postman testing
+	
+	  ex:
+	  https://sqko4k387j.execute-api.ap-south-2.amazonaws.com/uat/courses
+	
+	
+	
+	
+	
+		
+	
+
+
+
